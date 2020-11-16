@@ -23,9 +23,9 @@ public class NewListInformationService {
     @Autowired
     NewListInformationRepository newsListInformationRepository;
 
-    public NewListInformation newsListInformationAPICall(String urlString) throws IOException, JAXBException {
+    public NewListInformation newsListInformationAPICall(String urlString, String count) throws IOException, JAXBException {
         // open connection
-        URL url = new URL(urlString);
+        URL url = new URL(urlString+count);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("accept", "text/html,application/xhtml+xml,application/xml");         

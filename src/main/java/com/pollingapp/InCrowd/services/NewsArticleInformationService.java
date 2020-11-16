@@ -23,9 +23,9 @@ public class NewsArticleInformationService {
     @Autowired
     NewsArticleInformationRepository newsArticleInformationRepository;
 
-    public NewsArticleInformation newsArticleInformationAPICall(String urlString) throws IOException, JAXBException {
+    public NewsArticleInformation newsArticleInformationAPICall(String urlString,String id) throws IOException, JAXBException {
         // open connection
-        URL url = new URL(urlString);
+        URL url = new URL(urlString+id+"");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("accept", "text/html,application/xhtml+xml,application/xml");         

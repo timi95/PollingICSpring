@@ -2,8 +2,11 @@ package com.pollingapp.InCrowd.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.Executor;
+
+import javax.xml.bind.JAXBException;
 
 import com.pollingapp.InCrowd.classes.NewListInformation;
 import com.pollingapp.InCrowd.services.NewListInformationService;
@@ -21,10 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-
-
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * HelloWorldController
@@ -47,11 +47,10 @@ public class PollingController {
     @Autowired
     NewsArticleInformationService newsArticleInformationService;
 
-    @GetMapping(path="hello-world")
+    @GetMapping(path = "hello-world")
     public String HelloWorld() {
         return "Hello world !";
     }
-
 
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
@@ -59,35 +58,60 @@ public class PollingController {
 
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(10);
-        executor.setQueueCapacity   (100);
+        executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("Polling-");
         executor.initialize();
         return executor;
     }
 
+    private NewListInformation newsListInfo(
+        @RequestParam(required = true) String newsListInformationURL,
+        @RequestParam(required = false, defaultValue = "1") String count) {
+        NewListInformation listInfo;
+        try {
+            listInfo = newsListInformationService
+            .newsListInformationAPICall(newsListInformationURL,count);
+            newsListInformationService.saveNewListInformation(listInfo);
+            newsListInformationService.getAll();
+            return listInfo;
+        } catch (IOException | JAXBException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    private NewsArticleInformation newsArticleInfo(
+        @RequestParam(required = true) String newsArticleInformationURL,
+        @RequestParam(required = false, defaultValue = "173860") String id){
+        NewsArticleInformation article;
+        try {
+            article = newsArticleInformationService
+            .newsArticleInformationAPICall(newsArticleInformationURL,id);
+            newsArticleInformationService.saveNewsArticleInformation(article);
+            newsArticleInformationService.getAll();
+            return article;
+        } catch (IOException | JAXBException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+                
+    }
 
     @Async
     @Scheduled(fixedDelay = 10000) //run every ten seconds
     protected void pollingProcess() {
         try {
 
-            NewListInformation listInfo = newsListInformationService
-            .newsListInformationAPICall(newsListInformationURL);
-            
-            NewsArticleInformation article = newsArticleInformationService
-            .newsArticleInformationAPICall(newsArticleInformationURL);
-
-
-            newsArticleInformationService.saveNewsArticleInformation(article);
-            newsListInformationService.saveNewListInformation(listInfo);
-            
+            newsListInfo(newsListInformationURL,"5");
+            newsArticleInfo(newsArticleInformationURL, "173860");
             // contents revealed, saving successfully
-            newsArticleInformationService.getAll();
-            newsListInformationService.getAll();
         } catch (Exception e) {
             System.out.println(e);            
         }
-        System.out.println("\npollingProcess running: "+LocalDateTime.now());
+        System.out.println("\nPolling Process running: "+LocalDateTime.now());
     }
 
 }
