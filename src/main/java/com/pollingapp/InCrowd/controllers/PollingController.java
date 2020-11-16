@@ -11,6 +11,7 @@ import com.pollingapp.InCrowd.classes.NewsArticleInformation;
 import com.pollingapp.InCrowd.services.NewsArticleInformationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -33,16 +35,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RestController
 @RequestMapping("HelloWorld")
 public class PollingController {
+
+    // Take urls from properties sheet
+    @Value("${incrowd.api.url.newsList}")
+    public String newsListInformationURL;
+    @Value("${incrowd.api.url.newsArticle}")
+    public String newsArticleInformationURL;
+
     @Autowired
     NewListInformationService newsListInformationService;
     @Autowired
     NewsArticleInformationService newsArticleInformationService;
 
-    private String newsListInformationURL ="https://www.brentfordfc.com/api/incrowd/getnewlistinformation?count=1";
-    private String newsArticleInformationURL = "https://www.brentfordfc.com/api/incrowd/getnewsarticleinformation?id=173860";
-
-
-    // @GetMapping(path="hello-world")
+    @GetMapping(path="hello-world")
     public String HelloWorld() {
         return "Hello world !";
     }
