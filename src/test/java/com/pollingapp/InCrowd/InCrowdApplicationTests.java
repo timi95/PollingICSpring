@@ -40,7 +40,6 @@ class InCrowdApplicationTests {
 	
 		// Then
 		String mimeType = ContentType.getOrDefault(response.getEntity()).getMimeType();
-		System.out.println("\n MimeType of call: "+mimeType+"\n");
 		assertEquals( xmlMimeType, mimeType );
 	}
 }

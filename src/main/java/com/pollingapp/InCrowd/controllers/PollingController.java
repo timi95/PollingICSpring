@@ -64,6 +64,8 @@ public class PollingController {
         return executor;
     }
 
+    // separate functions for each service
+    // optional spring parameters for the service
     private NewListInformation newsListInfo(
         @RequestParam(required = true) String newsListInformationURL,
         @RequestParam(required = false, defaultValue = "1") String count) {
@@ -72,7 +74,7 @@ public class PollingController {
             listInfo = newsListInformationService
             .newsListInformationAPICall(newsListInformationURL,count);
             newsListInformationService.saveNewListInformation(listInfo);
-            newsListInformationService.getAll();
+            // newsListInformationService.getAll();
             return listInfo;
         } catch (IOException | JAXBException e) {
             // TODO Auto-generated catch block
