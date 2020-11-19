@@ -28,7 +28,7 @@ class InCrowdApplicationTests {
 	}
 
 	@Test
-	public void testAPI() throws ClientProtocolException, IOException {
+	public void check_MimeType_XML() throws ClientProtocolException, IOException {
 		String url = newsArticleInformationURL+"1";
 		
 		// Given
