@@ -17,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -52,6 +55,7 @@ public class PollingController {
         return "Hello world !";
     }
 
+
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -66,24 +70,26 @@ public class PollingController {
 
     // separate functions for each service
     // optional spring parameters for the service
-    private NewListInformation newsListInfo(
-        @RequestParam(required = true) String newsListInformationURL,
-        @RequestParam(required = false, defaultValue = "1") String count) {
+    @GetMapping(path="newsListInfo/{url}/{id}")
+    private ResponseEntity newsListInfo(
+        @PathVariable(name="url",required = true) String newsListInformationURL,
+        @PathVariable(name="count",required = false) String count) {
         NewListInformation listInfo;
         try {
             listInfo = newsListInformationService
             .newsListInformationAPICall(newsListInformationURL,count);
             newsListInformationService.saveNewListInformation(listInfo);
             // newsListInformationService.getAll();
-            return listInfo;
+            return ResponseEntity.ok(listInfo);
         } catch (IOException | JAXBException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            return null;
+            return  (ResponseEntity) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
 
+    
     private NewsArticleInformation newsArticleInfo(
         @RequestParam(required = true) String newsArticleInformationURL,
         @RequestParam(required = false, defaultValue = "173860") String id){
